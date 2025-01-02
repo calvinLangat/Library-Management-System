@@ -11,7 +11,6 @@
 
 #define MAXBOOKS	1000000
 #define STRSIZE		256
-int booksInLibrary;
 
 // Book struct
 typedef struct book{
@@ -30,16 +29,29 @@ typedef struct treenode{
 	struct treenode* right;
 } treenode;
 
+// Struct to keep track of empty slots in the books array after deletion
+typedef struct slots{
+	unsigned int count;
+	int slots[MAXBOOKS];
+} slots;
+
+
+// Globals
+int booksInLibrary;
+slots freeSlots;
 
 // Function declaration
 treenode* createNode(book* book);
-int insertBook(book* books, treenode** booktree, book* book);
-int insertToArray(book* books, book* book);
+treenode* getSuccessor(treenode* node);
+int insertBook(book* booksArray, treenode** booktree, book* book);
+int insertToArray(book* booksArray, book* book);
 int insertToBST(treenode** bookTreeRoot, book* book);
 
 int searchBook(treenode* booksTree, book* bookArray, const char* identifier, int isISBN, book* out_book);
 int searchBST(treenode* booksTree, const char* identifier, int isISBN);
 
+int deleteBook(treenode** booksTree, book* bookArray, const char* identifier, int isISBN);
+int deleteNode(treenode** booksTree, const char* identifier);
 
 int main(int argc, char* argv[])
 {
@@ -62,7 +74,7 @@ int main(int argc, char* argv[])
 		// Just a placeholder
 		if(insertBook(books, &booktree, &book))
 		{
-			booksInLibrary++;
+			
 		}
 		else
 		{
@@ -150,13 +162,26 @@ int insertToBST(treenode** bookTreeRoot, book* book)
 
 int insertToArray(book* books, book* book)
 {
+	int index = 0;
+	// Check if we have empty slots in array from previous deletions and use that slot
+	if(freeSlots.count > 0)
+	{
+		index = freeSlots.slots[freeSlots.count-1];
+		freeSlots.slots[freeSlots.count-1] = -1;
+		freeSlots.count--;	
+	}
+	else
+	{
+		index = booksInLibrary;
+		booksInLibrary++;
+	}
+
 	// strcpy checks for title and isbn were done in the previous step of insertToBST
-	strcpy_s(books[booksInLibrary].title, STRSIZE, book->title);
-	strcpy_s(books[booksInLibrary].author, STRSIZE, book->author);
-	strcpy_s(books[booksInLibrary].isbn, 13, book->isbn);
-
-	books[booksInLibrary].isAvailable = 1;
-
+	strcpy_s(books[index].title, STRSIZE, book->title);
+	strcpy_s(books[index].author, STRSIZE, book->author);
+	strcpy_s(books[index].isbn, 13, book->isbn);
+	books[index].isAvailable = 1;
+	
 	return 1;
 }
 
@@ -164,7 +189,7 @@ int searchBook(treenode* booksTree, book* bookArray, const char* identifier, int
 {
 	int index = searchBST(booksTree, identifier, isISBN);
 
-	// if not found return -1
+	// if return index is -1 return zero
 	if(index == -1)
 		return 0;
 	else
@@ -177,6 +202,7 @@ int searchBook(treenode* booksTree, book* bookArray, const char* identifier, int
 
 int searchBST(treenode* booksTree, const char* identifier, int isISBN)
 {
+	// if not found return -1
 	if(booksTree == NULL) return -1;
 	
 	if(isISBN) // If searching with ISBN
@@ -201,4 +227,81 @@ int searchBST(treenode* booksTree, const char* identifier, int isISBN)
 		// Not implemented
 		return -1;
 	}
+}
+
+int deleteBook(treenode** booksTree, book* bookArray, const char* identifier, int isISBN)
+{
+	int index = searchBST(*booksTree, identifier, isISBN);
+	if(index == -1) return 0;
+
+	int result = deleteNode(booksTree, identifier);
+
+	if(result == -1) return 0;
+
+	freeSlots.slots[freeSlots.count] = index;
+	freeSlots.count++;
+
+	return 1;
+}
+
+int deleteNode(treenode** booksTree, const char* identifier)
+{
+	treenode* root = *booksTree;
+	if(root == NULL)
+	{
+		return -1;
+	}
+
+	if(strcmp(root->isbn, identifier) < 0)
+	{
+		deleteNode(&root->right, identifier);
+	}
+	else if(strcmp(root->isbn, identifier) > 0)
+	{
+		deleteNode(&root->left, identifier);
+	}
+	else
+	{
+		if(root->left == NULL && root->right == NULL)
+		{
+			free(root);
+			*booksTree = NULL;
+		}
+		else if(root->left == NULL)
+		{
+			treenode* temp = root->right;
+			free(root);
+			*booksTree = temp;
+		}
+		else if(root->right == NULL)
+		{
+			treenode* temp = root->left;
+			free(root);
+			*booksTree = temp;
+		}
+		else
+		{
+			treenode* successor = getSuccessor(root->right);
+			strcpy_s(root->title, STRSIZE, successor->title);
+			strcpy_s(root->isbn, STRSIZE, successor->isbn);
+			root->index = successor->index;
+			return deleteNode(&root->right, successor->isbn);	
+		}
+		
+	}
+
+	return 1;
+}
+
+// Note that it is not a generic inorder successor function. It mainly works
+// when right child is not empty which is the case wwe need in BST delete
+treenode* getSuccessor(treenode* node)
+{
+	if(node == NULL)
+		return NULL;
+
+	while(node->left != NULL)
+		node = node->left;
+
+	return node;
 }
