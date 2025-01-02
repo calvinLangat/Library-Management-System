@@ -7,10 +7,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <limits.h>
 
 
-#define MAXBOOKS	INT_MAX
+#define MAXBOOKS	1000000
 #define STRSIZE		256
 int booksInLibrary;
 
@@ -34,7 +33,7 @@ typedef struct treenode{
 
 // Function declaration
 treenode* createNode(book* book);
-int insertBook(book* books, treenode* booktree, book* book);
+int insertBook(book* books, treenode** booktree, book* book);
 int insertToArray(book* books, book* book);
 int insertToBST(treenode** bookTreeRoot, book* book);
 
@@ -61,7 +60,7 @@ int main(int argc, char* argv[])
 	if(booksInLibrary < MAXBOOKS)
 	{
 		// Just a placeholder
-		if(insertBook(books, booktree, &book))
+		if(insertBook(books, &booktree, &book))
 		{
 			booksInLibrary++;
 		}
@@ -85,10 +84,15 @@ int main(int argc, char* argv[])
 treenode* createNode(book* book)
 {
 	treenode* node = malloc(sizeof(treenode));
+	if(node == NULL)
+	{
+		return NULL;
+	}
 
 	if(strcpy_s(node->title, STRSIZE, book->title) || strcpy_s(node->isbn, STRSIZE, book->isbn))
 	{
 		// If setting the title and isbn throws an error
+		free(node);
 		return NULL;
 	}
 	
@@ -99,10 +103,10 @@ treenode* createNode(book* book)
 	return node;
 }
 
-int insertBook(book* books, treenode* booktree, book* book)
+int insertBook(book* books, treenode** booktree, book* book)
 {
 	// Find a spot in the Registry (tree) first before inserting to shelf (Array)
-	if(insertToBST(&booktree, book))
+	if(insertToBST(booktree, book))
 	{
 		return insertToArray(books, book);		
 	}
@@ -165,7 +169,7 @@ int searchBook(treenode* booksTree, book* bookArray, const char* identifier, int
 		return 0;
 	else
 	{
-		out_book = &bookArray[index];
+		*out_book = bookArray[index];
 		return 1;
 	}
 
