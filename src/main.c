@@ -72,11 +72,7 @@ int main(int argc, char* argv[])
 	if(booksInLibrary < MAXBOOKS)
 	{
 		// Just a placeholder
-		if(insertBook(books, &booktree, &book))
-		{
-			
-		}
-		else
+		if(!insertBook(books, &booktree, &book))
 		{
 			printf("Failed to insert book.\n");
 		}
