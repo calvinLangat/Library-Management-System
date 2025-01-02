@@ -32,10 +32,10 @@ typedef struct treenode{
 
 
 // Function declaration
-int insertBook(book* books, treenode* booktree, const char* title, const char* author, const char* isbn);
-int insertToArray(book** books, const char* title, const char* author, const char* isbn);
-int insertToBST(treenode** bookTreeRoot, const char* title, const char* isbn);
-treenode* createNode(const char* title, const char* isbn);
+int insertBook(book* books, treenode* booktree, book* book);
+int insertToArray(book* books, book* book);
+int insertToBST(treenode** bookTreeRoot, book* book);
+treenode* createNode(book* book);
 
 
 int main(int argc, char* argv[])
@@ -52,10 +52,11 @@ int main(int argc, char* argv[])
 	// Use Binary search tree to store indicies to the array
 	treenode* booktree = NULL;	// Let insertToBST be responsible for initializing it
 
+	book book = {0};
 	if(booksInLibrary < MAXBOOKS)
 	{
 		// Just a placeholder
-		if(insertBook(books, booktree,"","", ""))
+		if(insertBook(books, booktree, &book))
 		{
 			booksInLibrary++;
 		}
@@ -68,11 +69,11 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-treenode* createNode(const char* title, const char* isbn)
+treenode* createNode(book* book)
 {
 	treenode* node = malloc(sizeof(treenode));
 
-	if(strcpy_s(node->title, STRSIZE, title) || strcpy_s(node->isbn, STRSIZE, isbn))
+	if(strcpy_s(node->title, STRSIZE, book->title) || strcpy_s(node->isbn, STRSIZE, book->isbn))
 	{
 		// If setting the title and isbn throws an error
 		return NULL;
@@ -85,13 +86,12 @@ treenode* createNode(const char* title, const char* isbn)
 	return node;
 }
 
-int insertBook(book* books, treenode* booktree, const char* title, const char* author,
-	const char* isbn)
+int insertBook(book* books, treenode* booktree, book* book)
 {
 	// Find a spot in the Registry (tree) first before inserting to shelf (Array)
-	if(insertToBST(&booktree, title, isbn))
+	if(insertToBST(&booktree, book))
 	{
-		return insertToArray(&books, title, author, isbn);		
+		return insertToArray(books, book);		
 	}
 	else
 	{
@@ -99,14 +99,14 @@ int insertBook(book* books, treenode* booktree, const char* title, const char* a
 	}
 }
 
-int insertToBST(treenode** bookTreeRoot, const char* title, const char* isbn)
+int insertToBST(treenode** bookTreeRoot, book* book)
 {
 	treenode* root = *bookTreeRoot;
 
 	// If the tree is empty
 	if(root == NULL)
 	{
-		*bookTreeRoot = createNode(title, isbn);
+		*bookTreeRoot = createNode(book);
 		if(bookTreeRoot == NULL)
 		{
 			return 0;
@@ -118,26 +118,27 @@ int insertToBST(treenode** bookTreeRoot, const char* title, const char* isbn)
 	}
 
 	// If there is a book with the same ISBN, return 0
-	if(strcmp(root->isbn, isbn) == 0)
+	if(strcmp(root->isbn, book->isbn) == 0)
 		return 0;
 
-	if(strcmp(root->isbn, isbn) > 0)
+	if(strcmp(root->isbn, book->isbn) > 0)
 	{
-		return insertToBST(&root->left, title, isbn);
+		return insertToBST(&root->left, book);
 	}
 	else
 	{
-		return insertToBST(&root->right, title, isbn);
+		return insertToBST(&root->right, book);
 	}
 }
 
-int insertToArray(book** books, const char* title, const char* author,
-	const char* isbn)
+int insertToArray(book* books, book* book)
 {
-	strcpy_s(books[booksInLibrary]->title, STRSIZE, title);
-	strcpy_s(books[booksInLibrary]->author, STRSIZE, author);
-	strcpy_s(books[booksInLibrary]->isbn, STRSIZE, isbn);
-	books[booksInLibrary]->isAvailable = 1;
+	// strcpy checks for title and isbn were done in the previous step of insertToBST
+	strcpy_s(books[booksInLibrary].title, STRSIZE, book->title);
+	strcpy_s(books[booksInLibrary].author, STRSIZE, book->author);
+	strcpy_s(books[booksInLibrary].isbn, STRSIZE, book->isbn);
+
+	books[booksInLibrary].isAvailable = 1;
 
 	return 1;
 }
