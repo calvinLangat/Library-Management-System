@@ -205,7 +205,8 @@ int searchBST(treenode* booksTree, const char* identifier, int isISBN)
 	// if not found return -1
 	if(booksTree == NULL) return -1;
 	
-	if(isISBN) // If searching with ISBN
+	// If searching with ISBN
+	if(isISBN)
 	{
 		if(strcmp(booksTree->isbn, identifier) == 0)
 		{
@@ -222,7 +223,8 @@ int searchBST(treenode* booksTree, const char* identifier, int isISBN)
 		}
 
 	}
-	else	// If searching with Title
+	// If searching with Title
+	else
 	{
 		// Not implemented
 		return -1;
@@ -238,6 +240,7 @@ int deleteBook(treenode** booksTree, book* bookArray, const char* identifier, in
 
 	if(result == -1) return 0;
 
+	// Deletion successful, update the freeSlot record
 	freeSlots.slots[freeSlots.count] = index;
 	freeSlots.count++;
 
@@ -254,31 +257,38 @@ int deleteNode(treenode** booksTree, const char* identifier)
 
 	if(strcmp(root->isbn, identifier) < 0)
 	{
+		 // Recurse into the right subtree
 		deleteNode(&root->right, identifier);
 	}
 	else if(strcmp(root->isbn, identifier) > 0)
 	{
+		 // Recurse into the left subtree
 		deleteNode(&root->left, identifier);
 	}
 	else
 	{
+		// Found the node to delete
+		// Case 1: No children
 		if(root->left == NULL && root->right == NULL)
 		{
 			free(root);
 			*booksTree = NULL;
 		}
+		// Case 2a: One child (right)
 		else if(root->left == NULL)
 		{
 			treenode* temp = root->right;
 			free(root);
 			*booksTree = temp;
 		}
+		// Case 2b: One child (left)
 		else if(root->right == NULL)
 		{
 			treenode* temp = root->left;
 			free(root);
 			*booksTree = temp;
 		}
+		 // Case 3: Two children
 		else
 		{
 			treenode* successor = getSuccessor(root->right);
@@ -289,12 +299,10 @@ int deleteNode(treenode** booksTree, const char* identifier)
 		}
 		
 	}
-
+	// Node deleted successfully
 	return 1;
 }
 
-// Note that it is not a generic inorder successor function. It mainly works
-// when right child is not empty which is the case wwe need in BST delete
 treenode* getSuccessor(treenode* node)
 {
 	if(node == NULL)
