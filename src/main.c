@@ -7,9 +7,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 
-#define MAXBOOKS	1000000
+#define MAXBOOKS	INT_MAX
 #define STRSIZE		256
 int booksInLibrary;
 
@@ -23,8 +24,8 @@ typedef struct book{
 
 // Binary Search Tree struct
 typedef struct treenode{
-	char title[256];
-	char isbn[256];
+	char title[STRSIZE];
+	char isbn[STRSIZE];
 	int index;
 	struct treenode* left;
 	struct treenode* right;
@@ -32,15 +33,19 @@ typedef struct treenode{
 
 
 // Function declaration
+treenode* createNode(book* book);
 int insertBook(book* books, treenode* booktree, book* book);
 int insertToArray(book* books, book* book);
 int insertToBST(treenode** bookTreeRoot, book* book);
-treenode* createNode(book* book);
+
+int searchBook(treenode* booksTree, book* bookArray, const char* identifier, int isISBN, book* out_book);
+int searchBST(treenode* booksTree, const char* identifier, int isISBN);
 
 
 int main(int argc, char* argv[])
 {
 	booksInLibrary = 0;
+
 	// Use array to store the book structs
 	book* books = malloc(MAXBOOKS*sizeof(book));
 	if(books == NULL)
@@ -64,6 +69,14 @@ int main(int argc, char* argv[])
 		{
 			printf("Failed to insert book.\n");
 		}
+	}
+
+	struct book book1;
+	
+	// Another placeholder
+	if(!searchBook(booktree, books, "", 1, &book1))
+	{
+		printf("Could not find book.\n");
 	}
 
 	return 0;
@@ -136,9 +149,52 @@ int insertToArray(book* books, book* book)
 	// strcpy checks for title and isbn were done in the previous step of insertToBST
 	strcpy_s(books[booksInLibrary].title, STRSIZE, book->title);
 	strcpy_s(books[booksInLibrary].author, STRSIZE, book->author);
-	strcpy_s(books[booksInLibrary].isbn, STRSIZE, book->isbn);
+	strcpy_s(books[booksInLibrary].isbn, 13, book->isbn);
 
 	books[booksInLibrary].isAvailable = 1;
 
 	return 1;
+}
+
+int searchBook(treenode* booksTree, book* bookArray, const char* identifier, int isISBN, book* out_book)
+{
+	int index = searchBST(booksTree, identifier, isISBN);
+
+	// if not found return -1
+	if(index == -1)
+		return 0;
+	else
+	{
+		out_book = &bookArray[index];
+		return 1;
+	}
+
+}
+
+int searchBST(treenode* booksTree, const char* identifier, int isISBN)
+{
+	if(booksTree == NULL) return -1;
+	
+	if(isISBN) // If searching with ISBN
+	{
+		if(strcmp(booksTree->isbn, identifier) == 0)
+		{
+			return booksTree->index;
+		}
+
+		if(strcmp(booksTree->isbn, identifier) > 0)
+		{
+			return searchBST(booksTree->left, identifier, isISBN);
+		}
+		else
+		{
+			return searchBST(booksTree->right, identifier, isISBN);
+		}
+
+	}
+	else	// If searching with Title
+	{
+		// Not implemented
+		return -1;
+	}
 }
