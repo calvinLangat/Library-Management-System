@@ -43,7 +43,15 @@ int insertBook(book_t* bookArray, treenode_t** booktree, book_t* book)
 	// Find a spot in the Registry (tree) first before inserting to shelf (Array)
 	if(insertToBST(booktree, book))
 	{
-		return insertToArray(bookArray, book);		
+		if (insertToArray(bookArray, book))
+		{
+			booksInLibrary++;
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
 	}
 	else
 	{
@@ -95,8 +103,15 @@ int insertToArray(book_t* bookArray, book_t* book)
 	}
 	else
 	{
-		index = slotsUsed;
-		slotsUsed++;
+		if(slotsUsed < MAXBOOKS)
+		{
+			index = slotsUsed;
+			slotsUsed++;
+		}
+		else
+		{
+			return 0;
+		}
 	}
 
 	// strcpy checks for title and isbn were done in the previous step of insertToBST
@@ -167,7 +182,7 @@ int deleteBook(treenode_t** booksTree, book_t* bookArray, const char* identifier
 	// Deletion successful, update the freeSlot record
 	freeSlots.slots[freeSlots.count] = index;
 	freeSlots.count++;
-
+	booksInLibrary--;
 	return 1;
 }
 
