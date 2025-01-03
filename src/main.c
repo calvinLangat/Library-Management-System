@@ -18,17 +18,11 @@ int main(int argc, char* argv[])
 	treenode_t* booktree = NULL;	// Let insertToBST be responsible for initializing it
 
 	book_t book = {0};
-	if(slotsUsed < MAXBOOKS)
+
+	// Just a placeholder
+	if(!insertBook(books, &booktree, &book))
 	{
-		// Just a placeholder
-		if(!insertBook(books, &booktree, &book))
-		{
-			printf("Failed to insert book.\n");
-		}
-		else
-		{
-			booksInLibrary++;
-		}
+		printf("Failed to insert book.\n");
 	}
 
 	book_t book1;
@@ -42,10 +36,6 @@ int main(int argc, char* argv[])
 	if(!deleteBook(&booktree, books, "", 1))
 	{
 		printf("Failed to delete book.\n");
-	}
-	else
-	{
-		booksInLibrary--;
 	}
 
 	return 0;
