@@ -1,8 +1,14 @@
 #include "library.h"
 
+// Globals
+int booksInLibrary;
+int slotsUsed;
+slots freeSlots;
+
+
 treenode* createNode(book* book)
 {
-	treenode* node = (treenode *)malloc(sizeof(treenode));
+	treenode* node = malloc(sizeof(treenode));
 	if(node == NULL)
 	{
 		return NULL;

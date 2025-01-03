@@ -1,10 +1,5 @@
 #include "library.h"
 
-// Globals
-int booksInLibrary;
-int slotsUsed;
-slots freeSlots;
-
 
 int main(int argc, char* argv[])
 {
