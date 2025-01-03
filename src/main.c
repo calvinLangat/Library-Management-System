@@ -7,7 +7,7 @@ int main(int argc, char* argv[])
 	slotsUsed = 0;
 
 	// Use array to store the book structs
-	book* books = malloc(MAXBOOKS*sizeof(book));
+	book_t* books = malloc(MAXBOOKS*sizeof(book_t));
 	if(books == NULL)
 	{
 		printf("Failed to heap allocate memory for book array.\n");
@@ -15,9 +15,9 @@ int main(int argc, char* argv[])
 	}
 
 	// Use Binary search tree to store indicies to the array
-	treenode* booktree = NULL;	// Let insertToBST be responsible for initializing it
+	treenode_t* booktree = NULL;	// Let insertToBST be responsible for initializing it
 
-	book book = {0};
+	book_t book = {0};
 	if(slotsUsed < MAXBOOKS)
 	{
 		// Just a placeholder
@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	struct book book1;
+	book_t book1;
 	
 	// Another placeholder
 	if(!searchBook(booktree, books, "", 1, &book1))

@@ -3,12 +3,12 @@
 // Globals
 int booksInLibrary;
 int slotsUsed;
-slots freeSlots;
+slots_t freeSlots;
 
 
-treenode* createNode(book* book)
+treenode_t* createNode(book_t* book)
 {
-	treenode* node = malloc(sizeof(treenode));
+	treenode_t* node = malloc(sizeof(treenode_t));
 	if(node == NULL)
 	{
 		return NULL;
@@ -38,12 +38,12 @@ treenode* createNode(book* book)
 	return node;
 }
 
-int insertBook(book* books, treenode** booktree, book* book)
+int insertBook(book_t* bookArray, treenode_t** booktree, book_t* book)
 {
 	// Find a spot in the Registry (tree) first before inserting to shelf (Array)
 	if(insertToBST(booktree, book))
 	{
-		return insertToArray(books, book);		
+		return insertToArray(bookArray, book);		
 	}
 	else
 	{
@@ -51,9 +51,9 @@ int insertBook(book* books, treenode** booktree, book* book)
 	}
 }
 
-int insertToBST(treenode** bookTreeRoot, book* book)
+int insertToBST(treenode_t** bookTreeRoot, book_t* book)
 {
-	treenode* root = *bookTreeRoot;
+	treenode_t* root = *bookTreeRoot;
 
 	// If the tree is empty
 	if(root == NULL)
@@ -83,7 +83,7 @@ int insertToBST(treenode** bookTreeRoot, book* book)
 	}
 }
 
-int insertToArray(book* books, book* book)
+int insertToArray(book_t* bookArray, book_t* book)
 {
 	int index = 0;
 	// Check if we have empty slots in array from previous deletions and use that slot
@@ -100,15 +100,15 @@ int insertToArray(book* books, book* book)
 	}
 
 	// strcpy checks for title and isbn were done in the previous step of insertToBST
-	strcpy_s(books[index].title, STRSIZE, book->title);
-	strcpy_s(books[index].author, STRSIZE, book->author);
-	strcpy_s(books[index].isbn, 13, book->isbn);
-	books[index].isAvailable = 1;
+	strcpy_s(bookArray[index].title, STRSIZE, book->title);
+	strcpy_s(bookArray[index].author, STRSIZE, book->author);
+	strcpy_s(bookArray[index].isbn, 13, book->isbn);
+	bookArray[index].isAvailable = 1;
 	
 	return 1;
 }
 
-int searchBook(treenode* booksTree, book* bookArray, const char* identifier, int isISBN, book* out_book)
+int searchBook(treenode_t* booksTree, book_t* bookArray, const char* identifier, int isISBN, book_t* out_book)
 {
 	int index = searchBST(booksTree, identifier, isISBN);
 
@@ -124,7 +124,7 @@ int searchBook(treenode* booksTree, book* bookArray, const char* identifier, int
 	}
 }
 
-int searchBST(treenode* booksTree, const char* identifier, int isISBN)
+int searchBST(treenode_t* booksTree, const char* identifier, int isISBN)
 {
 	// if not found return -1
 	if(booksTree == NULL) return -1;
@@ -155,7 +155,7 @@ int searchBST(treenode* booksTree, const char* identifier, int isISBN)
 	}
 }
 
-int deleteBook(treenode** booksTree, book* bookArray, const char* identifier, int isISBN)
+int deleteBook(treenode_t** booksTree, book_t* bookArray, const char* identifier, int isISBN)
 {
 	int index = searchBST(*booksTree, identifier, isISBN);
 	if(index == -1) return 0;
@@ -171,9 +171,9 @@ int deleteBook(treenode** booksTree, book* bookArray, const char* identifier, in
 	return 1;
 }
 
-int deleteNode(treenode** booksTree, const char* identifier)
+int deleteNode(treenode_t** booksTree, const char* identifier)
 {
-	treenode* root = *booksTree;
+	treenode_t* root = *booksTree;
 	if(root == NULL)
 	{
 		return -1;
@@ -201,21 +201,21 @@ int deleteNode(treenode** booksTree, const char* identifier)
 		// Case 2a: One child (right)
 		else if(root->left == NULL)
 		{
-			treenode* temp = root->right;
+			treenode_t* temp = root->right;
 			free(root);
 			*booksTree = temp;
 		}
 		// Case 2b: One child (left)
 		else if(root->right == NULL)
 		{
-			treenode* temp = root->left;
+			treenode_t* temp = root->left;
 			free(root);
 			*booksTree = temp;
 		}
 		 // Case 3: Two children
 		else
 		{
-			treenode* successor = getSuccessor(root->right);
+			treenode_t* successor = getSuccessor(root->right);
 			strcpy_s(root->title, STRSIZE, successor->title);
 			strcpy_s(root->isbn, STRSIZE, successor->isbn);
 			root->index = successor->index;
@@ -227,7 +227,7 @@ int deleteNode(treenode** booksTree, const char* identifier)
 	return 1;
 }
 
-treenode* getSuccessor(treenode* node)
+treenode_t* getSuccessor(treenode_t* node)
 {
 	if(node == NULL)
 		return NULL;

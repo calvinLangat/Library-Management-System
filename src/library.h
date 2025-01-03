@@ -17,7 +17,7 @@ typedef struct book{
 	char author[STRSIZE];
 	char isbn[13];
 	int isAvailable;
-} book;
+} book_t;
 
 // Binary Search Tree struct
 typedef struct treenode{
@@ -26,30 +26,30 @@ typedef struct treenode{
 	int index;
 	struct treenode* left;
 	struct treenode* right;
-} treenode;
+} treenode_t;
 
 // Struct to keep track of empty slots in the books array after deletion
 typedef struct slots{
 	unsigned int count;
 	int slots[MAXBOOKS];
-} slots;
+} slots_t;
 
 // Globals
 extern int booksInLibrary;
 extern int slotsUsed;
-extern slots freeSlots;
+extern slots_t freeSlots;
 
 
 // Function declaration
-treenode* createNode(book* book);
-treenode* getSuccessor(treenode* node);
-int insertBook(book* booksArray, treenode** booktree, book* book);
-int insertToArray(book* booksArray, book* book);
-int insertToBST(treenode** bookTreeRoot, book* book);
+treenode_t* createNode(book_t* book);
+treenode_t* getSuccessor(treenode_t* node);
+int insertBook(book_t* booksArray, treenode_t** booktree, book_t* book);
+int insertToArray(book_t* booksArray, book_t* book);
+int insertToBST(treenode_t** bookTreeRoot, book_t* book);
 
-int searchBook(treenode* booksTree, book* bookArray, const char* identifier, int isISBN, book* out_book);
-int searchBST(treenode* booksTree, const char* identifier, int isISBN);
+int searchBook(treenode_t* booksTree, book_t* bookArray, const char* identifier, int isISBN, book_t* out_book);
+int searchBST(treenode_t* booksTree, const char* identifier, int isISBN);
 
-int deleteBook(treenode** booksTree, book* bookArray, const char* identifier, int isISBN);
-int deleteNode(treenode** booksTree, const char* identifier);
+int deleteBook(treenode_t** booksTree, book_t* bookArray, const char* identifier, int isISBN);
+int deleteNode(treenode_t** booksTree, const char* identifier);
 
