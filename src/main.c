@@ -38,6 +38,7 @@ typedef struct slots{
 
 // Globals
 int booksInLibrary;
+int slotsUsed;
 slots freeSlots;
 
 // Function declaration
@@ -56,6 +57,7 @@ int deleteNode(treenode** booksTree, const char* identifier);
 int main(int argc, char* argv[])
 {
 	booksInLibrary = 0;
+	slotsUsed = 0;
 
 	// Use array to store the book structs
 	book* books = malloc(MAXBOOKS*sizeof(book));
@@ -69,12 +71,16 @@ int main(int argc, char* argv[])
 	treenode* booktree = NULL;	// Let insertToBST be responsible for initializing it
 
 	book book = {0};
-	if(booksInLibrary < MAXBOOKS)
+	if(slotsUsed < MAXBOOKS)
 	{
 		// Just a placeholder
 		if(!insertBook(books, &booktree, &book))
 		{
 			printf("Failed to insert book.\n");
+		}
+		else
+		{
+			booksInLibrary++;
 		}
 	}
 
@@ -84,6 +90,15 @@ int main(int argc, char* argv[])
 	if(!searchBook(booktree, books, "", 1, &book1))
 	{
 		printf("Could not find book.\n");
+	}
+
+	if(!deleteBook(&booktree, books, "", 1))
+	{
+		printf("Failed to delete book.\n");
+	}
+	else
+	{
+		booksInLibrary--;
 	}
 
 	return 0;
@@ -104,7 +119,17 @@ treenode* createNode(book* book)
 		return NULL;
 	}
 	
-	node->index = booksInLibrary;
+	int index = 0;
+	if(freeSlots.count > 0)
+	{
+		index = freeSlots.slots[freeSlots.count-1];
+	}
+	else
+	{
+		index = slotsUsed;
+	}
+
+	node->index = index;
 	node->left = NULL;
 	node->right = NULL;
 
@@ -138,7 +163,7 @@ int insertToBST(treenode** bookTreeRoot, book* book)
 		}
 		else
 		{
-		return 1;	
+			return 1;
 		}
 	}
 
@@ -168,8 +193,8 @@ int insertToArray(book* books, book* book)
 	}
 	else
 	{
-		index = booksInLibrary;
-		booksInLibrary++;
+		index = slotsUsed;
+		slotsUsed++;
 	}
 
 	// strcpy checks for title and isbn were done in the previous step of insertToBST
@@ -187,13 +212,14 @@ int searchBook(treenode* booksTree, book* bookArray, const char* identifier, int
 
 	// if return index is -1 return zero
 	if(index == -1)
+	{
 		return 0;
+	}
 	else
 	{
 		*out_book = bookArray[index];
 		return 1;
 	}
-
 }
 
 int searchBST(treenode* booksTree, const char* identifier, int isISBN)
