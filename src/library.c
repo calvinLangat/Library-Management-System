@@ -14,7 +14,7 @@ treenode_t* createNode(book_t* book)
 		return NULL;
 	}
 
-	if(strcpy_s(node->title, STRSIZE, book->title) || strcpy_s(node->isbn, STRSIZE, book->isbn))
+	if(strcpy_s(node->title, STRSIZE, book->title) || strcpy_s(node->isbn, ISBNSIZE, book->isbn))
 	{
 		// If setting the title and isbn throws an error
 		free(node);
@@ -102,7 +102,7 @@ int insertToArray(book_t* bookArray, book_t* book)
 	// strcpy checks for title and isbn were done in the previous step of insertToBST
 	strcpy_s(bookArray[index].title, STRSIZE, book->title);
 	strcpy_s(bookArray[index].author, STRSIZE, book->author);
-	strcpy_s(bookArray[index].isbn, 13, book->isbn);
+	strcpy_s(bookArray[index].isbn, ISBNSIZE, book->isbn);
 	bookArray[index].isAvailable = 1;
 	
 	return 1;
@@ -217,7 +217,7 @@ int deleteNode(treenode_t** booksTree, const char* identifier)
 		{
 			treenode_t* successor = getSuccessor(root->right);
 			strcpy_s(root->title, STRSIZE, successor->title);
-			strcpy_s(root->isbn, STRSIZE, successor->isbn);
+			strcpy_s(root->isbn, ISBNSIZE, successor->isbn);
 			root->index = successor->index;
 			return deleteNode(&root->right, successor->isbn);	
 		}

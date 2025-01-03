@@ -10,12 +10,13 @@
 
 #define MAXBOOKS	1000000
 #define STRSIZE		256
+#define ISBNSIZE	14		// 13 + null termination
 
 // Book struct
 typedef struct book{
 	char title[STRSIZE];
 	char author[STRSIZE];
-	char isbn[13];
+	char isbn[ISBNSIZE];
 	int isAvailable;
 } book_t;
 
