@@ -18,14 +18,6 @@ int main(int argc, char* argv[])
 	// Use Binary search tree to store indicies to the array
 	treenode_t* booktree = NULL;	// Let insertToBST be responsible for initializing it
 
-	book_t book = {0};
-
-	// Just a placeholder
-	// if(!insertBook(booksArray, &booktree, &book))
-	// {
-	// 	printf("Failed to insert book.\n");
-	// }
-
 
 	if(!insertBooksFromCSV(file, &booktree, booksArray))
 	{

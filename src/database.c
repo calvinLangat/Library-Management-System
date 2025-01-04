@@ -270,13 +270,12 @@ int insertBooksFromCSV(const char* file, treenode_t** booksTree, book_t* booksAr
 	book_t book = {0};
 	int tokenIndex = 0;
 	int fileIndex  = 0;
-	char strbuff[STRSIZE];
 	
 
 	while (fileIndex < fileLength)
 	{
 	    int comma = 0; // Reset comma at the start of each line
-	    char strbuff[256]; // Assuming strbuff is big enough to store the token
+	    char strbuff[STRSIZE]; // Assuming strbuff is big enough to store the token
 
 	    // Reset book structure before parsing a new record
 	    memset(&book, 0, sizeof(book));
