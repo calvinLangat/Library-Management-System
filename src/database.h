@@ -8,7 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAXBOOKS	1000000
+
+#define MAXBOOKS	2000000
 #define STRSIZE		256
 #define ISBNSIZE	14		// 13 + null termination
 
@@ -44,7 +45,7 @@ extern slots_t freeSlots;
 // Function declaration
 treenode_t* createNode(book_t* book);
 treenode_t* getSuccessor(treenode_t* node);
-int insertBook(book_t* booksArray, treenode_t** booktree, book_t* book);
+int insertBook(treenode_t** booktree, book_t* booksArray, book_t* book);
 int insertToArray(book_t* booksArray, book_t* book);
 int insertToBST(treenode_t** bookTreeRoot, book_t* book);
 
@@ -54,3 +55,4 @@ int searchBST(treenode_t* booksTree, const char* identifier, int isISBN);
 int deleteBook(treenode_t** booksTree, book_t* bookArray, const char* identifier, int isISBN);
 int deleteNode(treenode_t** booksTree, const char* identifier);
 
+int insertBooksFromCSV(const char* file, treenode_t** booksTree, book_t* booksArray);

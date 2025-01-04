@@ -1,4 +1,6 @@
 #include "database.h"
+#include "windowsAPI.h"
+
 
 // Globals
 int booksInLibrary;
@@ -38,12 +40,12 @@ treenode_t* createNode(book_t* book)
 	return node;
 }
 
-int insertBook(book_t* bookArray, treenode_t** booktree, book_t* book)
+int insertBook(treenode_t** booktree, book_t* booksArray, book_t* book)
 {
 	// Find a spot in the Registry (tree) first before inserting to shelf (Array)
 	if(insertToBST(booktree, book))
 	{
-		if (insertToArray(bookArray, book))
+		if (insertToArray(booksArray, book))
 		{
 			booksInLibrary++;
 			return 1;
@@ -251,4 +253,110 @@ treenode_t* getSuccessor(treenode_t* node)
 		node = node->left;
 
 	return node;
+}
+
+int insertBooksFromCSV(const char* file, treenode_t** booksTree, book_t* booksArray)
+{
+	// Use windows API to create memory mapped file of CSV
+	
+	int fileLength;
+	char* fileContents;
+
+	if(!readFile(file, &fileContents, &fileLength))
+	{
+		return 0;
+	}
+
+	book_t book = {0};
+	int tokenIndex = 0;
+	int fileIndex  = 0;
+	char strbuff[STRSIZE];
+	
+
+	while (fileIndex < fileLength)
+	{
+	    int comma = 0; // Reset comma at the start of each line
+	    char strbuff[256]; // Assuming strbuff is big enough to store the token
+
+	    // Reset book structure before parsing a new record
+	    memset(&book, 0, sizeof(book));
+
+	    while (fileIndex < fileLength && fileContents[fileIndex] != '\n') // Process until newline or EOF
+	    {
+	        tokenIndex = 0; // Reset tokenIndex at the start of each token
+	        // Parse each field, i.e., until a comma or newline is encountered
+	        while (fileIndex < fileLength && fileContents[fileIndex] != ',' && fileContents[fileIndex] != '\n')
+	        {
+	            strbuff[tokenIndex] = fileContents[fileIndex];
+	            tokenIndex++;
+	            fileIndex++;
+	        }
+
+	        strbuff[tokenIndex] = '\0'; // Null terminate the string
+
+	        // Process the token based on the `comma` index
+	        switch (comma)
+	        {
+	            case 0: // title
+	            	{
+	                	strcpy_s(book.title, sizeof(book.title), strbuff);
+	                } break;
+	            case 1: // author
+	                {
+	                	strcpy_s(book.author, sizeof(book.author), strbuff);
+	                } break;
+	            case 2: // ISBN
+	                {
+	                	strcpy_s(book.isbn, sizeof(book.isbn), strbuff);
+	                } break;
+	            case 3: // isAvailable
+	                // Before assigning to book.isAvailable, check if strbuff contains '0' or '1'
+					{
+						if (strcmp(strbuff, "0") == 0)
+						{
+						    book.isAvailable = 0;
+						}
+						else if (strcmp(strbuff, "1") == 0)
+						{
+						    book.isAvailable = 1;
+						}
+						else
+						{
+						    book.isAvailable = 0; // Default value if it's neither '0' nor '1'
+						}
+	                } break;
+	            default:
+	                return 0; // Unexpected case
+	        }
+
+	        // Increment the comma count
+	        comma++;
+
+	        // Skip the comma if present
+	        if (fileContents[fileIndex] == ',')
+	        {
+	            fileIndex++;
+	        }
+	    }
+
+	    // Skip the newline character (or end of line)
+	    if (fileContents[fileIndex] == '\n')
+	    {
+	        fileIndex++;
+	    }
+
+	    // Insert book record into DB
+	    if (!insertBook(booksTree, booksArray, &book))
+	    {
+	        // If fail, return 0, and exit function
+	        printf("Insertion Failed.\n");
+	        return 0;
+	    }
+	}
+
+
+	// Unmap file from memory and free resources
+	freeResources(fileContents);
+	
+	return 1;
 }
