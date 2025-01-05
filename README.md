@@ -49,19 +49,19 @@ A lightweight and efficient library management system implemented in C. This pro
    cd library-management-system
    ```
 
-2. Ensure Unity is initialized (if using as a submodule):
+2. Ensure Unity is initialized:
    ```bash
    git submodule update --init --recursive
    ```
 
 3. Compile the program using the provided scripts:
-
+   Make sure to pass `gcc` or `msvc` as an arguement, depending on which compiler you want to use.
    #### Windows Batch Script: `build.bat`
    1. Open Command Prompt.
    2. Navigate to the project directory.
    3. Execute:
       ```cmd
-      build.bat
+      build.bat gcc|msvc
       ```
    4. The executable will be created in the `build/` directory.
 
@@ -70,7 +70,7 @@ A lightweight and efficient library management system implemented in C. This pro
    2. Navigate to the project directory.
    3. Execute:
       ```powershell
-      .\build.ps1
+      .\build.ps1 gcc|msvc
       ```
    4. The executable will be created in the `build/` directory.
 
